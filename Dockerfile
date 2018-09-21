@@ -18,73 +18,27 @@
 #
 # http://numenta.org/licenses/
 # ----------------------------------------------------------------------
+FROM python:2.7
 
-FROM ubuntu:16.04
-
-ENV HOME=/root
-ENV PATH=$HOME/.local/bin:$PATH
-ENV PYTHONPATH=$HOME/.local/lib/python2.7/site-packages
-RUN echo $PYTHONPATH
-
-RUN apt-get update
-RUN apt-get install -y build-essential python python-dev cmake python-pip git-core pkg-config libfreetype6-dev libpng-dev zlib1g-dev curl
-
-RUN pip install --user -U setuptools
-RUN pip install --user -U pip
-RUN pip install --user -U wheel
-
-RUN mkdir $HOME/nta
-WORKDIR $HOME/nta
-
-# Clone relevant repos
-RUN git clone https://github.com/numenta/nupic.core
-RUN git clone https://github.com/numenta/htmresearch-core
-RUN git clone https://github.com/numenta/nupic
-RUN git clone https://github.com/numenta/htmresearch
-RUN git clone https://github.com/numenta/nupic.vision
-
-# Build & install nupic.bindings
-WORKDIR $HOME/nta/nupic.core
-RUN pip install --user -r bindings/py/requirements.txt
-RUN mkdir -p build/scripts
-WORKDIR $HOME/nta/htmresearch-core/build/scripts
-RUN cmake ../.. -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=../release -DNUPIC_IWYU=OFF -DPY_EXTENSIONS_DIR=../../bindings/py/src/nupic/bindings
-RUN make -j4 && make install
-WORKDIR $HOME/nta/nupic.core
-RUN pip install --user -e .
-
-# Build & install htmresearch-core
-WORKDIR $HOME/nta/htmresearch-core
-RUN pip install --user -r bindings/py/requirements.txt
-RUN mkdir -p build/scripts
-WORKDIR $HOME/nta/htmresearch-core/build/scripts
-RUN cmake ../.. -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=../release -DNUPIC_IWYU=OFF -DPY_EXTENSIONS_DIR=../../bindings/py/src/htmresearch_core
-RUN make -j4 && make install
-WORKDIR $HOME/nta/htmresearch-core
-RUN pip install --user -e .
-
-# Install nupic
-WORKDIR $HOME/nta/nupic
-RUN pip install --user -e .
-
-# Install htmresearch
-WORKDIR $HOME/nta/htmresearch
-RUN pip install --user -e .
-
-# Install nupic.vision
-WORKDIR $HOME/nta/nupic.vision
-RUN pip install --user -e .
+# install requirements
+COPY requirements.txt /nta/nupic.vision/requirements.txt
+RUN pip install -r /nta/nupic.vision/requirements.txt
 
 # Set up MNIST data
-WORKDIR $HOME/nta/nupic.vision/src/nupic/vision/mnist
-RUN /bin/bash extract_mnist.sh
-RUN mkdir mnist
-RUN mv mnist_extraction_source/training mnist/
-RUN mv mnist_extraction_source/testing mnist/
-RUN python ./convertImages.py mnist
-RUN /bin/bash create_training_sample.sh
+COPY src/nupic/vision/mnist /nta/nupic.vision/src/nupic/vision/mnist
+WORKDIR /nta/nupic.vision/src/nupic/vision/mnist
+RUN ./extract_mnist.sh
+RUN mkdir -p /nta/nupic.vision/data/mnist \
+    && mv mnist_extraction_source/training /nta/nupic.vision/data/mnist/ \
+    && mv mnist_extraction_source/testing /nta/nupic.vision/data/mnist/ \
+    && python ./convertImages.py /nta/nupic.vision/data/mnist \
+    && ./create_training_sample.sh /nta/nupic.vision/data/mnist
+
+# Install nupic.vision
+COPY . /nta/nupic.vision/
+WORKDIR /nta/nupic.vision
+RUN pip install -e .
 
 # Run the experiment
-WORKDIR $HOME/nta/nupic.vision/src/nupic/vision/mnist
-RUN ls -l
-RUN python saccades_experiment.py
+WORKDIR /nta/nupic.vision
+CMD ["python", "src/nupic/vision/mnist/run_mnist_experiment.py", "--data-dir", "data/mnist"]

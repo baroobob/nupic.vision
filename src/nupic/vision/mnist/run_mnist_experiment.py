@@ -256,7 +256,7 @@ def checkNet(net):
 
 if __name__ == "__main__":
   parser = argparse.ArgumentParser(description=__doc__)
-  parser.add_argument("--data-dir", dest="dataDir", default="data",
+  parser.add_argument("--data-dir", dest="dataDir", default="mnist",
                       help=("Location of MNIST data files downloaded by "
                             "nupic.vision.mnist.download"))
   args =parser.parse_args()
