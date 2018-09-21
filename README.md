@@ -4,7 +4,7 @@ This tool kit is intended to help people who are interested in using Numenta's N
 
 ## Running MNIST Experiment
 
-1. Install nupic.vision and it's dependencies
+1. Install nupic.vision and its dependencies
     ```
     pip install -e .
     ```
@@ -26,7 +26,7 @@ This tool kit is intended to help people who are interested in using Numenta's N
 
 ### Using Docker
 
-1. Build docker image
+1. Build docker image with prepared MNIST data 
     ```
     docker build -t nupic.vision .
     ```
