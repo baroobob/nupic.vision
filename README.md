@@ -1,3 +1,10 @@
+## This project is in Maintenance Mode
+
+We plan to do minor releases only, and limit changes in NuPIC and NuPIC Core to:
+
+- Fixing critical bugs.
+- Features needed to support ongoing research.
+
 This tool kit is intended to help people who are interested in using Numenta's 
 nupic on vision related problems.
 
