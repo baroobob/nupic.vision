@@ -1,0 +1,4 @@
+pillow==2.3.0
+enum34==1.0.4
+nupic==1.0.5
+htmresearch==0.0.2
