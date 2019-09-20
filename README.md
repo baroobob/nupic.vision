@@ -2,6 +2,13 @@
 
 This tool kit is intended to help people who are interested in using Numenta's NuPIC on vision problems.
 
+## This project is in Maintenance Mode
+
+We plan to do minor releases only, and limit changes in NuPIC and NuPIC Core to:
+
+- Fixing critical bugs.
+- Features needed to support ongoing research.
+
 ## Running MNIST Experiment
 
 1. Install nupic.vision and its dependencies
